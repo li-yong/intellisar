@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+    <title>GPIO Control</title>
+    <link rel="stylesheet" href='../static/master.css'/>
+</head>
+
+<body>
+<div>
+
+    <h1>Camera</h1>
+    <img src="{{ url_for('video_feed') }}" width="600">
+    <!--
+        <h2> Actuator Status </h2>
+        <h3> ENABLER ==> {{ enablerSts }}</h3>
+        <h3> RIGHT ==> {{ rightSts }}</h3>
+
+        <h3> LEFT==> {{ leftSts }}</h3>
+        <h3> FWD ==> {{ forwardSts }}</h3>
+        <h3> BAK ==> {{ backwardSts }}</h3>
+        <br>
+    -->
+    <h2> Commands </h2>
+    <h3>
+        <a href="/motor/fwd" class="button">Forward</a>
+        <a href="/motor/bwd" class="button">Backward</a>
+    </h3>
+    <h3>
+        <a href="/motor/left" class="button">Left</a>
+        <a href="/motor/right" class="button">Right</a>
+    </h3>
+    <h3>
+        <a href="/motor/stop" class="button">Stop</a>
+        <a href="/motor/reset" class="button">Reset</a>
+    </h3>
+
+
+    <h3>
+        <a href="/motor/speed100" class="button">Full Speed</a>
+        <a href="/motor/speed50" class="button">50% Speed</a>
+        <a href="/motor/speed10" class="button">10% Speed</a>
+    </h3>
+</div>
+
+</body>
+</html>
