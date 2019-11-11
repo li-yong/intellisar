@@ -95,7 +95,10 @@ def measure_average():
  
 if __name__ == '__main__':
     try:
-        BACKWARDING = False #whether the car is moving backwards
+        BACKWARDING = 0 #whether the car is moving backwards
+        FORWARDING = 1
+        TURNR = 0
+        TURNL = 0
         
         while True:
             dist = measure_average()
@@ -105,9 +108,9 @@ if __name__ == '__main__':
             time.sleep(1) 
 
             if dist < STOP_DISTANCE:
-                allow_straight = False
+                allow_straight = 0
             else:
-                allow_straight = True
+                allow_straight = 1
 
             
             allow_turn_left = GPIO.input(PIN_INF_L);
@@ -118,26 +121,35 @@ if __name__ == '__main__':
                 +"  allow_turn_right " +str(allow_turn_right)
                 +"  allow_turn_left " +str(allow_turn_left))
             
-            if (not BACKWARDING):#moving forward
+            if FORWARDING:#moving forward
                 if allow_straight:
-                    ctl.forward()
+                    if (TURNR or TURNL):
+                        ctl.forward()
+                        TURNL = 0
+                        TURNR = 0
                 elif allow_turn_right:
                     ctl.turn_right()
+                    TURNR = 1; 
                 elif allow_turn_left:
                     ctl.turn_left()
+                    TURNL = 1
                 else:
                     #turn 180 degreens back.
                     ctl.backward()
-                    BACKWARDING=True
-            else: #moving backward
+                    BACKWARDING=1
+                    FORWARDING=0
+            
+            if BACKWARDING: #moving backward
                 if allow_turn_left:
                     ctl.turn_left()
                     ctl.forward()
-                    BACKWARDING=False
+                    BACKWARDING=0
+                    FORWARDING=1
                 elif allow_turn_right:
                     ctl.turn_right()
                     ctl.forward()
-                    BACKWARDING=False
+                    BACKWARDING=0
+                    FORWARDING=1
                 else:
                     pass
 
