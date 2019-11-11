@@ -1,22 +1,39 @@
 #Libraries
 import RPi.GPIO as GPIO
 import time
+import control2 as ctl
  
-#GPIO Mode (BOARD / BCM)
+STOP_DISTANCE = 30
+IS_MOVING = True
 GPIO.setmode(GPIO.BOARD)
-#GPIO.setmode(GPIO.BCM)
- 
+
+PIN_EN = 40
+GPIO.setup(PIN_EN, GPIO.OUT)
+
+#PIN_PWM_L = 12
+#PIN_PWM_R = 11
+#GPIO.setup(PIN_PWM_L, GPIO.OUT)
+#GPIO.setup(PIN_PWM_R, GPIO.OUT)
+
+#PIN_R_DIR = 7
+#PIN_L_DIR = 15
+#GPIO.setup(PIN_R_DIR, GPIO.OUT)
+#GPIO.setup(PIN_L_DIR, GPIO.OUT)
+
+######### UltraSonic sensor #######
 #set GPIO Pins
 GPIO_TRIGGER = 36  #physical 36, BCM 16, GPIO.27
 GPIO_ECHO = 38     #physical 38, BCM 20, GPIO.28
 
-#GPIO_TRIGGER = 16  #physical 36, BCM 16, GPIO.27
-#GPIO_ECHO = 20     #physical 38, BCM 20, GPIO.28
-
-#set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 GPIO.output(GPIO_TRIGGER,  GPIO.LOW)
+
+######### Infrared  sensor #######
+PIN_INF_L = 29
+PIN_INF_R = 31
+GPIO.setup(PIN_INF_L, GPIO.IN)
+GPIO.setup(PIN_INF_R, GPIO.IN)
 
 print ("Waiting for sensor to settle")
 time.sleep(2)
@@ -63,27 +80,81 @@ def measure():
     return distance
     
 def measure_average():
+
   # This function takes 3 measurements and
   # returns the average.
-  distance1=measure()
-  time.sleep(0.001)
-  distance2=measure()
-  time.sleep(0.001)
-  distance3=measure()
-  distance = distance1 + distance2 + distance3
-  distance = distance / 3
-  return distance    
+  #distance1=measure()
+  #time.sleep(0.1)
+  #distance2=measure()
+  #time.sleep(0.1)
+  #distance3=measure()
+  #distance = distance1 + distance2 + distance3
+  #distance = distance / 3
+  #return distance    
+  return measure()    
  
 if __name__ == '__main__':
     try:
+        BACKWARDING = False #whether the car is moving backwards
+        
         while True:
             dist = measure_average()
-            print ("Measured Distance = %.1f cm" % dist)
-            time.sleep(0.1) 
+            #print ("Measured Distance = %.1f cm" % dist)
+            #time.sleep(0.1) 
+            #time.sleep(0.5) 
+            time.sleep(1) 
+
+            if dist < STOP_DISTANCE:
+                allow_straight = False
+            else:
+                allow_straight = True
+
             
-            #if (dist != 0):
-            #    print ("Measured Distance = %.1f cm" % dist)
-            #    time.sleep(1)
+            allow_turn_left = GPIO.input(PIN_INF_L);
+            allow_turn_right = GPIO.input(PIN_INF_R);
+            
+            print(
+                "allow_straight " +str(allow_straight) 
+                +"  allow_turn_right " +str(allow_turn_right)
+                +"  allow_turn_left " +str(allow_turn_left))
+            
+            if (not BACKWARDING):#moving forward
+                if allow_turn_right:
+                    ctl.turn_right()
+                elif allow_straight:
+                    ctl.forward()
+                elif allow_turn_left:
+                    ctl.turn_left()
+                else:
+                    #turn 180 degreens back.
+                    ctl.backward()
+                    BACKWARDING=True
+            else: #moving backward
+                if allow_turn_left:
+                    ctl.turn_left()
+                    ctl.forward()
+                    BACKWARDING=False
+                elif allow_turn_right:
+                    ctl.turn_right()
+                    ctl.forward()
+                    BACKWARDING=False
+                else:
+                    pass
+
+
+            '''
+            if (not allow_straight) and IS_MOVING and (GPIO.input(PIN_EN) == 1):        
+                GPIO.output(PIN_EN, GPIO.LOW)
+                IS_MOVING = False
+                print("less "+str(STOP_DISTANCE)+", stop")
+            elif allow_straight and (not IS_MOVING) and (GPIO.input(PIN_EN) == 0):
+                GPIO.output(PIN_EN, GPIO.HIGH)
+                IS_MOVING = True
+                print("more than "+str(STOP_DISTANCE)+", moving")
+            else:
+                pass
+            '''
+            
  
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:

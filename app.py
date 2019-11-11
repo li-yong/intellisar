@@ -10,7 +10,7 @@ import dht11
 import time
 import datetime
 
-from camera_pi import Camera
+#rom camera_pi import Camera
 
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ socketio = SocketIO(app)
 
 
 #GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+GPIO.setwarnings(True)
 
 #define sensors GPIOs
 enabler = 40 # enabler
@@ -27,12 +27,14 @@ right = 7 # right_dir
 #define actuators GPIOs
 left = 15  #left dir
 
+'''
 def gen(camera):
     """Video streaming generator function."""
     while True:
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+'''
 
 def readtmper():
     rtn = {
@@ -119,18 +121,19 @@ def on_update_event(data):
 def on_connect():
     print("Client connected ")
 
-
+'''
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-
+'''
 
 @app.route("/motor")
 def motor_index():
-    templateData = readsensor()
-    return  render_template('motor.html', **templateData)
+    #templateData = readsensor()
+    ctl.reset()
+    return  render_template('motor.html')
 
 # The function below is executed when someone requests a URL with the actuator name and action in it:
 @app.route("/<deviceName>/<action>")
@@ -147,13 +150,13 @@ def action(deviceName, action):
     if action == "stop":
         ctl.detach()
     if action == "reset":
-        ctl.break_stop()
+        ctl.reset()
     if action == "speed100":
-        ctl.speed_100()
+        ctl.speed(100,100)
     if action == "speed50":
-        ctl.speed_50()
+        ctl.speed(50,50)
     if action == "speed10":
-        ctl.speed_10()
+        ctl.speed(10,10)
     return '', 204
 
     #templateData = readsensor()
