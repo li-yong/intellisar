@@ -119,10 +119,10 @@ if __name__ == '__main__':
                 +"  allow_turn_left " +str(allow_turn_left))
             
             if (not BACKWARDING):#moving forward
-                if allow_turn_right:
-                    ctl.turn_right()
-                elif allow_straight:
+                if allow_straight:
                     ctl.forward()
+                elif allow_turn_right:
+                    ctl.turn_right()
                 elif allow_turn_left:
                     ctl.turn_left()
                 else:
