@@ -124,3 +124,5 @@ dmypy.json
 dht11.py
 nohup.out
 note
+templates/motor0.html
+templates/motor1.html
