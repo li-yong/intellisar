@@ -2,13 +2,22 @@
 import RPi.GPIO as GPIO
 import time
 import control2 as ctl
- 
+import logging
+
+
 STOP_DISTANCE = 30
 IS_MOVING = True
 GPIO.setmode(GPIO.BOARD)
 
 PIN_EN = 40
 GPIO.setup(PIN_EN, GPIO.OUT)
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+    
+    
 
 #PIN_PWM_L = 12
 #PIN_PWM_R = 11
@@ -35,10 +44,42 @@ PIN_INF_R = 31
 GPIO.setup(PIN_INF_L, GPIO.IN)
 GPIO.setup(PIN_INF_R, GPIO.IN)
 
-print ("Waiting for sensor to settle")
+logging.info("Waiting for sensor to settle")
 time.sleep(2)
- 
+
 def measure():
+  # This function measures a distance
+  MAX_TIME = 0.04 # max time waiting for response in case something is missed
+  # Pulse the trigger/echo line to initiate a measurement
+  GPIO.output(GPIO_TRIGGER, True)
+  time.sleep(0.00001)
+  GPIO.output(GPIO_TRIGGER, False)
+  #ensure start time is set in case of very quick return
+  start = time.time()
+  timeout = start + MAX_TIME
+
+  # set line to input to check for start of echo response
+  #GPIO.setup(GPIO_ECHO, GPIO.IN) 
+  while GPIO.input(GPIO_ECHO)==0 and start <= timeout: # At max wait MAX_TIME sec in case missed the 0.
+    start = time.time()
+  
+  stop = time.time()
+  timeout = stop + MAX_TIME
+  # Wait for end of echo response
+  while GPIO.input(GPIO_ECHO)==1 and stop <= timeout:
+    stop = time.time()
+  
+  #GPIO.setup(GPIO_TRIGECHO, GPIO.OUT)
+  #GPIO.output(GPIO_TRIGECHO, False)
+
+  elapsed = stop-start
+  distance = (elapsed * 34300)/2.0
+  time.sleep(0.02)
+  return distance
+  
+
+#measure without timeout. Cause high CPU loading.
+def measure_del():
     # set Trigger to HIGH
     GPIO.output(GPIO_TRIGGER,  GPIO.HIGH) 
     # set Trigger after 0.01ms to LOW
@@ -114,27 +155,27 @@ if __name__ == '__main__':
 
             
             allow_turn_left = GPIO.input(PIN_INF_L);
+            time.sleep(0.5)
             allow_turn_right = GPIO.input(PIN_INF_R);
             
-            print(
+            logging.info(
                 "allow_straight " +str(allow_straight) 
                 +"  allow_turn_right " +str(allow_turn_right)
                 +"  allow_turn_left " +str(allow_turn_left))
             
             if FORWARDING:#moving forward
-                if allow_straight:
-                    if (TURNR or TURNL):
+                if allow_straight: #keep forward 
+                    if (TURNR or TURNL): #change to forward if it was from forward->turn
                         ctl.forward()
                         TURNL = 0
                         TURNR = 0
-                elif allow_turn_right:
+                elif allow_turn_right: #turn whenever allowed, right first 
                     ctl.turn_right()
                     TURNR = 1; 
-                elif allow_turn_left:
+                elif allow_turn_left: #turn left when allowed
                     ctl.turn_left()
                     TURNL = 1
-                else:
-                    #turn 180 degreens back.
+                else:  #was moving forward, not allow straight, right and left. Turn 180 degreens back.
                     ctl.backward()
                     BACKWARDING=1
                     FORWARDING=0

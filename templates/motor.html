@@ -29,69 +29,131 @@
   <style>
     .grid-container {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      grid-template-areas: "Head Head Head""camera camera camera""camera camera camera""camera camera camera""left up right""left stop right""left down right""speed-area speed-area speed-area""Bottom Bottom Bottom";
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr 2fr 0.1fr 3.5fr 1fr 1fr;
+      grid-template-areas: "Head Head""camera camera""camera camera""camera camera"". .""motor_ctl cam_ctl""motor_reset cam_reset""Bottom Bottom";
     }
-
 
     .Head {
       grid-area: Head;
+    }
+
+    .camera {
+      grid-area: camera;
     }
 
     .Bottom {
       grid-area: Bottom;
     }
 
-    .camera {
-      grid-area: camera;
-      text-align: center;
-      align-items: center;
-      justify-content: center;
+    .motor_ctl {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-areas: ". m_up .""m_left m_stop m_right"". m_down .";
+      grid-area: motor_ctl;
     }
 
-    .up {
-      grid-area: up;
-      display: flex;
-      /*align-items: center;*/
-      justify-content: center;
-    }
-
-    .stop {
-      grid-area: stop;
+    .m_up {
+      grid-area: m_up;
       display: flex;
       justify-content: center;
     }
 
-
-    .down {
-      grid-area: down;
+    .m_stop {
+      grid-area: m_stop;
       display: flex;
       justify-content: center;
     }
 
-    .left {
-      grid-area: left;
+    .m_down {
+      grid-area: m_down;
+      display: flex;
+      justify-content: center;
+    }
+
+    .m_left {
+      grid-area: m_left;
       display: inline-grid;
       justify-content: flex-end;
       vertical-align: middle;
     }
 
-    .right {
-      grid-area: right;
+    .m_right {
+      grid-area: m_right;
       display: inline-grid;
       justify-content: flex-start;
       vertical-align: middle;
     }
 
+    .cam_ctl {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-areas: ". c_up .""c_left c_stop c_right"". c_down .";
+      grid-area: cam_ctl;
+    }
 
-
-    .speed-area {
-      grid-area: speed-area;
+    .c_up {
+      grid-area: c_up;
       display: flex;
       justify-content: center;
-      align-items: center;
     }
+
+    .c_stop {
+      grid-area: c_stop;
+      display: flex;
+      justify-content: center;
+    }
+
+    .c_left {
+      grid-area: c_left;
+      display: inline-grid;
+      justify-content: flex-end;
+      vertical-align: middle;
+    }
+
+    .c_right {
+      grid-area: c_right;
+      display: inline-grid;
+      justify-content: flex-start;
+      vertical-align: middle;
+    }
+
+    .c_down {
+      grid-area: c_down;
+      display: flex;
+      justify-content: center;
+    }
+
+    .motor_reset {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: "m_speed m_reset .";
+      grid-area: motor_reset;
+    }
+
+    .m_speed {
+      grid-area: m_speed;
+    }
+
+    .m_reset {
+      grid-area: m_reset;
+    }
+
+    .cam_reset {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: "c_reset . .";
+      grid-area: cam_reset;
+    }
+
+    .c_reset {
+      grid-area: c_reset;
+    }
+
 
     a:link {
       text-decoration: none;
@@ -112,8 +174,8 @@
             <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink"
               data-toggle="dropdown">Menu</a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="#">Motor Control</a>
-              <a class="dropdown-item" href="#">Sensor Data</a>
+              <a class="dropdown-item" href="/motor">Motor Control</a>
+              <a class="dropdown-item" href="/temp">Sensor Data</a>
               <a class="dropdown-item" href="#">GPS</a>
               <div class="dropdown-divider"> </div>
               <a class="dropdown-item" href="#">Object Recognization</a>
@@ -122,6 +184,10 @@
         </ul>
       </div>
     </div>
+
+    <div class="camera"><img alt="Camera Stream" src="http://{{ request.host.split(':')[0] }}:8080/stream/video.h264">
+    </div>
+
     <div class="Bottom">
       <footer class="footer">
         <div class="container">
@@ -129,40 +195,74 @@
         </div>
       </footer>
     </div>
-    <div class="camera"><img alt="Camera Stream" src="http://192.168.199.142:8080/stream/video.h264">
-    </div>
-    <div class="up"><a href="/motor/fwd" class="btn btn-lg btn-primary btn-block" type="button">Forward</a></div>
-    <div class="stop"><a href="/motor/stop" class="btn btn-danger btn-lg btn-primary  btn-block" type="button">Stop</a>
-    </div>
-    <div class="right"><button type="button" class="btn btn-primary" onclick="location.href='/motor/right';"> Right
-      </button></div>
-    <div class="left"> <button type="button" class="btn btn-primary" onclick="location.href='/motor/left';"> Left
-      </button></div>
-    <div class=" down"><a href="/motor/bwd" class="btn btn-lg btn-primary  btn-block" type="button">Back</a></div>
 
 
 
+    <div class="motor_ctl">
+      <div class="m_up"><a href="/motor/fwd" class="btn btn-lg btn-primary btn-block" type="button">Forward</a></div>
 
-
-    <div class="speed-area">
-      <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Speed
-          <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-          <li><a href="/motor/speed100">100%</a></li>
-          <li><a href="/motor/speed50">50%</a></li>
-          <li><a href="/motor/speed10">10%</a></li>
-        </ul>
+      <div class="m_stop"><a href="/motor/stop" class="btn btn-danger btn-lg btn-primary  btn-block"
+          type="button">Stop</a>
       </div>
 
-      <div class="btn-group " role="group">
-        <button class="btn btn-secondary" type="button">
-          <a href="/motor/resets" style="color:inherit"> Reset </a>
-        </button>
+      <div class="m_down"><a href="/motor/bwd" class="btn btn-lg btn-primary  btn-block" type="button">Back</a></div>
+
+      <div class="m_left"> <button type="button" class="btn btn-primary" onclick="location.href='/motor/left';"> Left
+        </button></div>
+
+      <div class="m_right"><button type="button" class="btn btn-primary" onclick="location.href='/motor/right';"> Right
+        </button></div>
+
+    </div>
+
+    <div class="cam_ctl">
+      <div class="c_up"><a href="/cam/up" class="btn btn-lg btn-primary btn-block" type="button">Forward</a></div>
+      <div class="c_stop"><a href="/cam/stop" class="btn btn-danger btn-lg btn-primary  btn-block"
+          type="button">Stop</a>
+      </div>
+      <div class="c_left"> <button type="button" class="btn btn-primary" onclick="location.href='/cam/left';"> Left
+        </button></div>
+      <div class="c_right"><button type="button" class="btn btn-primary" onclick="location.href='/cam/right';"> Right
+        </button></div>
+      <div class="c_down"><a href="/cam/down" class="btn btn-lg btn-primary  btn-block" type="button">Back</a></div>
+    </div>
+
+    <div class="motor_reset">
+      <div class="m_speed">
+        <div class="dropdown" style="margin: 10px;">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Speed
+            <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li><a href="/motor/speed100">100%</a></li>
+            <li><a href="/motor/speed50">50%</a></li>
+            <li><a href="/motor/speed10">10%</a></li>
+          </ul>
+        </div>
+      </div>
+
+
+      <div class="m_reset">
+        <div class="btn-group " role="group">
+          <button class="btn btn-secondary" type="button">
+            <a href="/motor/resets" style="color:inherit"> Reset </a>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cam_reset">
+      <div class="c_reset">
+        <div class="btn-group " role="group">
+          <button class="btn btn-secondary" type="button">
+            <a href="/cam/resets" style="color:inherit"> Reset </a>
+          </button>
+        </div>
       </div>
     </div>
 
   </div>
+
 
 
 </body>

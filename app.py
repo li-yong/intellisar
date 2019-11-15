@@ -9,6 +9,8 @@ import control2 as ctl
 import dht11
 import time
 import datetime
+import logging
+
 
 #rom camera_pi import Camera
 
@@ -26,6 +28,14 @@ enabler = 40 # enabler
 right = 7 # right_dir
 #define actuators GPIOs
 left = 15  #left dir
+
+
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
 
 '''
 def gen(camera):
@@ -52,10 +62,10 @@ def readtmper():
 
         if result.is_valid():
             itime = str(datetime.datetime.now())
-            #print("Last valid input: " + itime)
+            #logging.info("Last valid input: " + itime)
 
-            #print("Temperature: %-3.1f C" % result.temperature)
-            #print("Humidity: %-3.1f %%" % result.humidity)
+            #logging.info("Temperature: %-3.1f C" % result.temperature)
+            #logging.info("Humidity: %-3.1f %%" % result.humidity)
 
             rtn = {
                 'time': itime,
@@ -111,15 +121,15 @@ def temp_index():
 
 @socketio.on('update_event')
 def on_update_event(data):
-    print("server received update request.")
+    logging.info("server received update request.")
     templateData = readtmper()
     send(templateData)
-    print("server sent update request"+str(templateData))
+    logging.info("server sent update request"+str(templateData))
     emit('receiveSensorData', templateData)
 
 @socketio.on('connect')
 def on_connect():
-    print("Client connected ")
+    logging.info("Client connected ")
 
 '''
 @app.route('/video_feed')
@@ -132,31 +142,44 @@ def video_feed():
 @app.route("/motor")
 def motor_index():
     #templateData = readsensor()
-    ctl.reset()
+    #ctl.reset()
     return  render_template('motor.html')
 
 # The function below is executed when someone requests a URL with the actuator name and action in it:
 @app.route("/<deviceName>/<action>")
 def action(deviceName, action):
-
-    if action == "fwd":
-        ctl.forward()
-    if action == "bwd":
-        ctl.backward()
-    if action == "left":
-        ctl.turn_left()
-    if action == "right":
-        ctl.turn_right()
-    if action == "stop":
-        ctl.detach()
-    if action == "reset":
-        ctl.reset()
-    if action == "speed100":
-        ctl.speed(100,100)
-    if action == "speed50":
-        ctl.speed(50,50)
-    if action == "speed10":
-        ctl.speed(10,10)
+    if (deviceName == 'motor'):
+        if action == "fwd":
+            ctl.forward()
+        if action == "bwd":
+            ctl.backward()
+        if action == "left":
+            ctl.turn_left()
+        if action == "right":
+            ctl.turn_right()
+        if action == "stop":
+            ctl.detach()
+        if action == "reset":
+            ctl.reset()
+        if action == "speed100":
+            ctl.speed(100,100)
+        if action == "speed50":
+            ctl.speed(50,50)
+        if action == "speed10":
+            ctl.speed(10,10)
+     elif deviceName=='cam':
+        if action == "up":
+            ctl.cam_up()
+        if action == "down":
+            ctl.cam_down()
+        if action == "left":
+            ctl.cam_left()
+        if action == "right":
+            ctl.cam_right()
+        if action == "stop":
+            ctl.cam_stop()
+        if action == "reset":
+            ctl.cam_position_reset()
     return '', 204
 
     #templateData = readsensor()
@@ -168,5 +191,5 @@ def index():
 
 
 if __name__ == "__main__":
-   app.run(host='0.0.0.0', port=80, debug=True)
-   #socketio.run(app)
+    logging.info("program start")
+    app.run(host='0.0.0.0', port=80, debug=True)
