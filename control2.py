@@ -107,32 +107,46 @@ def reset():
 #Camera movement
 def servo_pulse(serve_pin, angle):
     pulsewidth = (angle * 11) + 500
-    GPIO.output(ServoPin, GPIO.HIGH)
+    GPIO.output(serve_pin, GPIO.HIGH)
     time.sleep(pulsewidth/1000000.0)
-    GPIO.output(ServoPin, GPIO.LOW)
+    GPIO.output(serve_pin, GPIO.LOW)
     time.sleep(20.0/1000-pulsewidth/1000000.0)
     
 def cam_left():
+    cam_enable()
     for pos in range(181):
         servo_pulse(PIN_CAM_H, pos)
         time.sleep(0.01) 
             
 def cam_right():
+    cam_enable()
     for pos in reversed(range(181)):
         servo_pulse(PIN_CAM_H, pos)
         time.sleep(0.01) 
 
 def cam_up():
+    cam_enable()
     for pos in range(181):
         servo_pulse(PIN_CAM_V, pos)
         time.sleep(0.01) 
             
 def cam_down():
+    cam_enable()
     for pos in reversed(range(181)):
         servo_pulse(PIN_CAM_V, pos)
         time.sleep(0.01) 
-
+        
+def cam_stop():
+    GPIO.output(PIN_CAM_H, GPIO.LOW)
+    GPIO.output(PIN_CAM_V, GPIO.LOW)
+                    
+def cam_enable():
+    pass
+    #GPIO.output(PIN_CAM_H, GPIO.HIGH)
+    #GPIO.output(PIN_CAM_V, GPIO.HIGH)
+                    
 def cam_position_reset():
-     servo_pulse(PIN_CAM_H, 90)
-     servo_pulse(PIN_CAM_V, 90)
+    cam_enable()
+    servo_pulse(PIN_CAM_H, 90)
+    servo_pulse(PIN_CAM_V, 90)
            

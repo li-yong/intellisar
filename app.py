@@ -167,7 +167,7 @@ def action(deviceName, action):
             ctl.speed(50,50)
         if action == "speed10":
             ctl.speed(10,10)
-     elif deviceName=='cam':
+    elif (deviceName=='cam'):
         if action == "up":
             ctl.cam_up()
         if action == "down":
