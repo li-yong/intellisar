@@ -19,6 +19,12 @@ PIN_CAM_H = 35
 PIN_CAM_V = 33
 
 
+H_Low_Degree = 90-45
+H_High_Degree = 90+45
+
+V_Low_Degree = 90-45
+V_High_Degree = 90+45
+
 channel_list = [PIN_EN, PIN_R_DIR, PIN_L_DIR, PIN_PWM_L,PIN_PWM_R,PIN_CAM_H,PIN_CAM_V]
 
 GPIO.setup(channel_list, GPIO.OUT)
@@ -114,25 +120,26 @@ def servo_pulse(serve_pin, angle):
     
 def cam_left():
     cam_enable()
-    for pos in range(181):
+    for pos in range(H_Low_Degree,H_High_Degree):
         servo_pulse(PIN_CAM_H, pos)
         time.sleep(0.01) 
             
 def cam_right():
     cam_enable()
-    for pos in reversed(range(181)):
+    for pos in reversed(range(H_Low_Degree,H_High_Degree)):
         servo_pulse(PIN_CAM_H, pos)
         time.sleep(0.01) 
 
 def cam_up():
     cam_enable()
-    for pos in range(181):
+    for pos in range(V_Low_Degree,V_High_Degree):
         servo_pulse(PIN_CAM_V, pos)
         time.sleep(0.01) 
             
 def cam_down():
     cam_enable()
-    for pos in reversed(range(181)):
+    #for pos in reversed(range(40,181)):
+    for pos in reversed(range(V_Low_Degree,V_High_Degree)):
         servo_pulse(PIN_CAM_V, pos)
         time.sleep(0.01) 
         
@@ -149,4 +156,5 @@ def cam_position_reset():
     cam_enable()
     servo_pulse(PIN_CAM_H, 90)
     servo_pulse(PIN_CAM_V, 90)
+    logging.info("cam_position_reset")
            
