@@ -35,7 +35,7 @@ pr = GPIO.PWM(PIN_PWM_R, 20000)
 
 
 logging.basicConfig(
-    filename='control2.log', filemode='w',
+    #filename='control2.log', filemode='w',
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
@@ -154,7 +154,8 @@ def cam_enable():
                     
 def cam_position_reset():
     cam_enable()
-    servo_pulse(PIN_CAM_H, 90)
-    servo_pulse(PIN_CAM_V, 90)
+    for i in range(10):
+        servo_pulse(PIN_CAM_H, 90)
+        servo_pulse(PIN_CAM_V, 90)
     logging.info("cam_position_reset")
            

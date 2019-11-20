@@ -32,8 +32,8 @@ left = 15  #left dir
 
 
 logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
+    format='%(asctime)s %(levelname)-8s %(message)s', 
+    level=logging.INFO,filename='app.log',
     datefmt='%Y-%m-%d %H:%M:%S')
 
 

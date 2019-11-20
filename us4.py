@@ -9,14 +9,14 @@ STOP_DISTANCE = 30
 IS_MOVING = True
 GPIO.setmode(GPIO.BOARD)
 
-PIN_EN = 40
-GPIO.setup(PIN_EN, GPIO.OUT)
+#PIN_EN = 40
+#GPIO.setup(PIN_EN, GPIO.OUT)
 
 logging.basicConfig(
+    filename='us4.log', filemode='w', 
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
+    level=logging.INFO, 
     datefmt='%Y-%m-%d %H:%M:%S')
-    
     
 
 #PIN_PWM_L = 12
@@ -44,8 +44,6 @@ PIN_INF_R = 31
 GPIO.setup(PIN_INF_L, GPIO.IN)
 GPIO.setup(PIN_INF_R, GPIO.IN)
 
-logging.info("Waiting for sensor to settle")
-time.sleep(2)
 
 def measure():
   # This function measures a distance
@@ -60,21 +58,27 @@ def measure():
 
   # set line to input to check for start of echo response
   #GPIO.setup(GPIO_ECHO, GPIO.IN) 
-  while GPIO.input(GPIO_ECHO)==0 and start <= timeout: # At max wait MAX_TIME sec in case missed the 0.
-    start = time.time()
+  while GPIO.input(GPIO_ECHO)==0:
+    if (start <= timeout): # At max wait MAX_TIME sec in case missed the 0.
+        start = time.time()
+    else:
+        logging.info("start timeout")
   
   stop = time.time()
   timeout = stop + MAX_TIME
   # Wait for end of echo response
-  while GPIO.input(GPIO_ECHO)==1 and stop <= timeout:
-    stop = time.time()
+  while GPIO.input(GPIO_ECHO)==1:
+    if (stop <= timeout):
+        stop = time.time()
+    else:
+        logging.info("stop timeout")
   
   #GPIO.setup(GPIO_TRIGECHO, GPIO.OUT)
   #GPIO.output(GPIO_TRIGECHO, False)
 
   elapsed = stop-start
-  distance = (elapsed * 34300)/2.0
-  time.sleep(0.02)
+  distance = round(elapsed * 17150, 2)
+  #time.sleep(0.02)
   return distance
   
 
@@ -132,9 +136,14 @@ def measure_average():
   #distance = distance1 + distance2 + distance3
   #distance = distance / 3
   #return distance    
+
   return measure()    
+  #return measure_del()    
  
 if __name__ == '__main__':
+    logging.info("Waiting for sensor to settle")
+    time.sleep(2)
+
     try:
         BACKWARDING = 0 #whether the car is moving backwards
         FORWARDING = 1
@@ -143,7 +152,7 @@ if __name__ == '__main__':
         
         while True:
             dist = measure_average()
-            #print ("Measured Distance = %.1f cm" % dist)
+            logging.info ("Measured Distance = %.1f cm" % dist)
             #time.sleep(0.1) 
             #time.sleep(0.5) 
             time.sleep(1) 
@@ -162,6 +171,8 @@ if __name__ == '__main__':
                 "allow_straight " +str(allow_straight) 
                 +"  allow_turn_right " +str(allow_turn_right)
                 +"  allow_turn_left " +str(allow_turn_left))
+                
+            logging.info("FORWARDING:"+str(FORWARDING)+" TURNL:"+str(TURNL)+" TURNR:"+str(TURNR)+" BACKWARDING:"+str(BACKWARDING))
             
             if FORWARDING:#moving forward
                 if allow_straight: #keep forward 
@@ -212,4 +223,4 @@ if __name__ == '__main__':
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
-        GPIO.cleanup()
+        #GPIO.cleanup()

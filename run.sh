@@ -17,7 +17,7 @@ sleep 2;
 #curl -r 0-20 -o /dev/null http://localhost:8080/stream/video.h264
 
 sudo pkill python;
-nohup python us4.py &
+#nohup sudo python us4.py &
 
 sudo python app.py;
 
