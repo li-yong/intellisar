@@ -184,7 +184,11 @@ def action(deviceName, action):
         if action == "stop":
             ctl.cam_stop()
         if action == "reset":
-            ctl.cam_position_reset()
+            ctl.cam_position_reset() 
+        if action == "h_patrol":
+            ctl.cam_h_patrol()
+        if action == "v_patrol":
+            ctl.cam_v_patrol()
     return '', 204
 
     #templateData = readsensor()

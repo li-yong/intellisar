@@ -130,6 +130,12 @@ def cam_right():
         servo_pulse(PIN_CAM_H, pos)
         time.sleep(0.01) 
 
+def cam_h_patrol():
+    while(1):
+        cam_left()
+        time.sleep(1)
+        cam_right()
+        
 def cam_up():
     cam_enable()
     for pos in range(V_Low_Degree,V_High_Degree):
