@@ -174,11 +174,19 @@
             <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink"
               data-toggle="dropdown">Menu</a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="/motor">Motor Control</a>
-              <a class="dropdown-item" href="/temp">Sensor Data</a>
-              <a class="dropdown-item" href="#">GPS</a>
+              <a class="dropdown-item" href="/motor">
+                <font size="5">Motor Control</font>
+              </a>
+              <a class="dropdown-item" href="/temp">
+                <font size="5">Sensor Data</font>
+              </a>
+              <a class="dropdown-item" href="#">
+                <font size="5">GPS</font>
+              </a>
               <div class="dropdown-divider"> </div>
-              <a class="dropdown-item" href="#">Object Recognization</a>
+              <a class="dropdown-item" href="#">
+                <font size="5">Object Recognization</font>
+              </a>
             </div>
           </li>
         </ul>
@@ -233,9 +241,15 @@
           <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Speed
             <span class="caret"></span></button>
           <ul class="dropdown-menu">
-            <li><a href="/motor/speed100">100%</a></li>
-            <li><a href="/motor/speed50">50%</a></li>
-            <li><a href="/motor/speed10">10%</a></li>
+            <li><a href="/motor/speed100">
+                <font size="5">100%</font>
+              </a></li>
+            <li><a href="/motor/speed50">
+                <font size="5">50%</font>
+              </a></li>
+            <li><a href="/motor/speed10">
+                <font size="5">10%</font>
+              </a></li>
           </ul>
         </div>
       </div>
@@ -244,22 +258,32 @@
       <div class="m_reset">
         <div class="btn-group " role="group">
           <button class="btn btn-secondary" type="button">
-            <a href="/motor/reset" style="color:inherit"> Reset </a>
+            <a href="/motor/reset" style="color:inherit"> Motor Reset </a>
           </button>
         </div>
       </div>
 
     </div>
 
-    <div class="cam_reset">
-      <div class="c_reset">
-        <div class="btn-group " role="group">
+  
+      <div class="cam_reset">
+ 
           <button class="btn btn-secondary" type="button">
-            <a href="/cam/reset" style="color:inherit"> Reset </a>
+            <a href="/cam/reset" style="color:inherit"> Camera Position Reset </a>
           </button>
-        </div>
+
+          <button class="btn btn-secondary" type="button">
+            <a href="/cam/reset" style="color:inherit"> Camera Horizental Around </a>
+          </button>
+
+          <button class="btn btn-secondary" type="button">
+            <a href="/cam/reset" style="color:inherit"> Camera Vertical Around </a>
+          </button>
+
+
+ 
       </div>
-    </div>
+ 
 
   </div>
 
