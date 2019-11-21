@@ -86,17 +86,17 @@
             grid-area: Humidity;
         }
 
-        .div_green_box {
+        .div_blue_temp_box {
             width: 30px;
-            border: 15px solid green;
+            border: 15px solid blue;
             padding: 0px;
             margin: 0px;
         }
 
 
-        .div_yellow_box {
+        .div_orange_hum_box {
             width: 30px;
-            border: 15px solid yellow;
+            border: 15px solid orange;
             padding: 0px;
             margin: 0px;
         }
@@ -160,9 +160,9 @@
 
         <div class="Legend">Legend:
             <ul style="list-style-type:disc;">
-                <li>Temperature <div class="div_green_box"></div>
+                <li>Humidity<div class="div_orange_hum_box"></div>
                 </li>
-                <li>Humidity <div class="div_yellow_box"></div>
+                <li>Temperature<div class="div_blue_temp_box"></div>
                 </li>
             </ul>
         </div>
@@ -223,8 +223,9 @@
                 { time: time, y: templateData.humi }
             ]);
 
-            document.getElementById("div_temp_data").innerHTML = templateData.temp;
-            document.getElementById("div_humidity_data").innerHTML = templateData.humi;
+            document.getElementById("div_time_data").innerHTML = '<font size="5">'+time+'</font>';
+            document.getElementById("div_temp_data").innerHTML = '<font size="5">'+templateData.temp+'</font>';
+            document.getElementById("div_humidity_data").innerHTML = '<font size="5">'+templateData.humi+'</font>';
 
 
         });
