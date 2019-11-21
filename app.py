@@ -117,7 +117,12 @@ def readsensor():
 @app.route("/temp")
 def temp_index():
     templateData = readtmper()
-    return render_template("temp.html", **templateData)
+    return render_template("temp.html", **templateData)  
+    
+@app.route("/temp0")
+def temp_index0():
+    templateData = readtmper()
+    return render_template("temp0.html", **templateData)
 
 @socketio.on('update_event')
 def on_update_event(data):
