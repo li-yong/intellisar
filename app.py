@@ -174,12 +174,11 @@ def action(deviceName, action):
             ctl.speed(10,10)
     elif (deviceName=='cam'):
         if action == "up":
-            ctl.cam_up_step()
+            ctl.cam_up()
         if action == "down":
             ctl.cam_down_step()
         if action == "left":
-            #ctl.cam_left()
-            ctl.cam_left_step()
+            ctl.cam_left()
         if action == "right":
             ctl.cam_right_step()
         if action == "stop":

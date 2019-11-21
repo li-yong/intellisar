@@ -124,7 +124,7 @@ def cam_left_step():
         
 def cam_right_step():
     cam_enable()
-    servo_pulse(PIN_CAM_H, -10)
+    servo_pulse(PIN_CAM_H, 10)
         
 def cam_up_step():
     cam_enable()
@@ -149,7 +149,7 @@ def cam_right():
 
 def cam_h_patrol():
     #while(1):
-    for i in range(5):
+    for i in range(1):
         cam_left()
         time.sleep(1)
         cam_right()
@@ -171,7 +171,7 @@ def cam_down():
         
 def cam_v_patrol():
     #while(1):
-    for i in range(5):
+    for i in range(1):
         cam_up()
         time.sleep(1)
         cam_down()
