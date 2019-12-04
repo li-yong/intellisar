@@ -139,6 +139,9 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 '''
 
+
+
+
 @app.route("/motor")
 def motor_index():
     #templateData = readsensor()
