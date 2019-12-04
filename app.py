@@ -117,7 +117,12 @@ def readsensor():
 @app.route("/temp")
 def temp_index():
     templateData = readtmper()
-    return render_template("temp.html", **templateData)
+    return render_template("temp.html", **templateData)  
+    
+@app.route("/temp0")
+def temp_index0():
+    templateData = readtmper()
+    return render_template("temp0.html", **templateData)
 
 @socketio.on('update_event')
 def on_update_event(data):
@@ -174,15 +179,19 @@ def action(deviceName, action):
         if action == "up":
             ctl.cam_up()
         if action == "down":
-            ctl.cam_down()
+            ctl.cam_down_step()
         if action == "left":
             ctl.cam_left()
         if action == "right":
-            ctl.cam_right()
+            ctl.cam_right_step()
         if action == "stop":
             ctl.cam_stop()
         if action == "reset":
-            ctl.cam_position_reset()
+            ctl.cam_position_reset() 
+        if action == "h_patrol":
+            ctl.cam_h_patrol()
+        if action == "v_patrol":
+            ctl.cam_v_patrol()
     return '', 204
 
     #templateData = readsensor()

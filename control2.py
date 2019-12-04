@@ -118,6 +118,23 @@ def servo_pulse(serve_pin, angle):
     GPIO.output(serve_pin, GPIO.LOW)
     time.sleep(20.0/1000-pulsewidth/1000000.0)
     
+def cam_left_step():
+    cam_enable()
+    servo_pulse(PIN_CAM_H, 10)
+        
+def cam_right_step():
+    cam_enable()
+    servo_pulse(PIN_CAM_H, 10)
+        
+def cam_up_step():
+    cam_enable()
+    servo_pulse(PIN_CAM_V, 10)
+        
+def cam_down_step():
+    cam_enable()
+    servo_pulse(PIN_CAM_V, -10)
+    
+    
 def cam_left():
     cam_enable()
     for pos in range(H_Low_Degree,H_High_Degree):
@@ -130,6 +147,15 @@ def cam_right():
         servo_pulse(PIN_CAM_H, pos)
         time.sleep(0.01) 
 
+def cam_h_patrol():
+    #while(1):
+    for i in range(1):
+        cam_left()
+        time.sleep(1)
+        cam_right()
+        time.sleep(1)
+
+        
 def cam_up():
     cam_enable()
     for pos in range(V_Low_Degree,V_High_Degree):
@@ -142,6 +168,14 @@ def cam_down():
     for pos in reversed(range(V_Low_Degree,V_High_Degree)):
         servo_pulse(PIN_CAM_V, pos)
         time.sleep(0.01) 
+        
+def cam_v_patrol():
+    #while(1):
+    for i in range(1):
+        cam_up()
+        time.sleep(1)
+        cam_down()
+        time.sleep(1)         
         
 def cam_stop():
     GPIO.output(PIN_CAM_H, GPIO.LOW)

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-    <title>Environental Sensors</title>
+    <title>Environmental Sensors</title>
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 
@@ -26,9 +26,7 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
@@ -37,17 +35,19 @@
         crossorigin="anonymous"></script>
 
     <script>
-        var nextTime = (function () {
-            var currentTime = parseInt(new Date().getTime() / 1000);
-            return function () {
-                return currentTime++;
-            }
-        })();
+    var nextTime = (function () {
+    var currentTime = parseInt(new Date().getTime() / 1000);
+    return function () {
+    return currentTime++;
+    }
+    })();
 
-        var start = function () {
-            interval = setInterval(updateSensorData, 1000);
-            updateSensorData();
-        }
+    var start = function () {
+    interval = setInterval(updateSensorData, 1000);
+    updateSensorData();
+    }
+
+ 
     </script>
 
     <style>
@@ -55,7 +55,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
             grid-template-rows: 1fr 2.2fr 0.4fr 0.4fr;
-            grid-template-areas: "Head Head Head Head""Sensor Sensor Sensor Sensor""Time Temp Humidity Legend""Bottom Bottom Bottom Bottom";
+            grid-template-areas: "Head Head Head Head""test test test test""Time Temp Humidity Legend""Bottom Bottom Bottom Bottom";
         }
 
         .Head {
@@ -68,6 +68,10 @@
 
         .Sensor {
             grid-area: Sensor;
+        }
+		
+        .test {
+            grid-area: test;
         }
 
         .Legend {
@@ -82,17 +86,17 @@
             grid-area: Humidity;
         }
 
-        .div_green_box {
+        .div_blue_temp_box {
             width: 30px;
-            border: 15px solid green;
+            border: 15px solid dodgerblue;
             padding: 0px;
             margin: 0px;
         }
 
 
-        .div_yellow_box {
+        .div_orange_hum_box {
             width: 30px;
-            border: 15px solid yellow;
+            border: 15px solid orange;
             padding: 0px;
             margin: 0px;
         }
@@ -108,13 +112,16 @@
 <h3> humi ==> {{ humi }}</h3>
 -->
 
+
     <div class="grid-container">
         <div class="Head">
             <div class="col-md-12">
+
                 <ul class="nav ">
+		    <h2>Temperature & Humidity</h2>
                     <li class="nav-item dropdown ml-md-auto ">
                         <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink"
-                            data-toggle="dropdown">Menu</a>
+                            data-toggle="dropdown"><font size="5">Menu</font></a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="/motor"><font size="5">Motor Control</font></a>
                             <a class="dropdown-item" href="/temp"><font size="5">Sensor Data</font></a>
@@ -136,10 +143,12 @@
         </div>
 
 
-        <div id="chart" class="Sensor">
-            <h2>Temperature & Humidity </h2>
+        <div id="test-1" class="test">
             <div class="epoch"></div>
         </div>
+
+ 
+	
 
 
         <div id="div_time" class="Time">Time<div id="div_time_data"></div>
@@ -152,22 +161,27 @@
 
         <div class="Legend">Legend:
             <ul style="list-style-type:disc;">
-                <li>Temperature <div class="div_green_box"></div>
+                <li>Humidity<div class="div_orange_hum_box"></div>
                 </li>
-                <li>Humidity <div class="div_yellow_box"></div>
+                <li>Temperature<div class="div_blue_temp_box"></div>
                 </li>
             </ul>
         </div>
     </div>
 
 
-    <script>
-        var socket = io();
+</div>
+
+<!-- <button onclick="createGame()">Create Game</button> -->
+
+<script>
+
+    var socket = io();
 
 
-        socket.on('connect', function () {
-            console.log('Websocket connected!');
-        });
+    socket.on('connect', function () {
+        console.log('Websocket connected!');
+    });
 
 
         var data = [
@@ -176,7 +190,7 @@
         ];
 
 
-        var chart = $('#chart .epoch').epoch({
+        var chart = $('#test-1 .epoch').epoch({
             type: 'time.line',
             data: data,
             axes: ['right', 'bottom'],
@@ -210,15 +224,15 @@
                 { time: time, y: templateData.humi }
             ]);
 
-            document.getElementById("div_temp_data").innerHTML = templateData.temp;
-            document.getElementById("div_humidity_data").innerHTML = templateData.humi;
+            document.getElementById("div_time_data").innerHTML = '<font size="5">'+time+'</font>';
+            document.getElementById("div_temp_data").innerHTML = '<font size="5">'+templateData.temp+'</font>';
+            document.getElementById("div_humidity_data").innerHTML = '<font size="5">'+templateData.humi+'</font>';
 
 
         });
 
 
-    </script>
-
+</script>
 
 </body>
 
