@@ -218,15 +218,18 @@
 
             time = nextTime();
             console.log(time);
+			
+			var d = new Date(0)
+			datetime = d.setUTCSeconds(time);
 
             chart.push([
                 { time: time, y: templateData.temp },
                 { time: time, y: templateData.humi }
             ]);
 
-            document.getElementById("div_time_data").innerHTML = '<font size="5">'+time+'</font>';
-            document.getElementById("div_temp_data").innerHTML = '<font size="5">'+templateData.temp+'</font>';
-            document.getElementById("div_humidity_data").innerHTML = '<font size="5">'+templateData.humi+'</font>';
+            document.getElementById("div_time_data").innerHTML = '<font size="5">'+d+'</font>';
+            document.getElementById("div_temp_data").innerHTML = '<font size="5">'+templateData.temp+'&#8451;</font>';
+            document.getElementById("div_humidity_data").innerHTML = '<font size="5">'+templateData.humi+'&#37;</font>';
 
 
         });

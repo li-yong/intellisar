@@ -30,7 +30,7 @@
     .grid-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr 2fr 0.1fr 1.5fr 0.5fr 0.5fr;
+      grid-template-rows: 0.2fr 1fr 1fr 2fr 0.1fr 1.5fr 0.1fr 0.1fr;
       grid-template-areas: "Head Head""camera camera""camera camera""camera camera"". .""motor_ctl cam_ctl""motor_reset cam_reset""Bottom Bottom";
     }
 
@@ -40,6 +40,7 @@
 
     .camera {
       grid-area: camera;
+	  text-align: center;
     }
 
     .Bottom {
@@ -170,6 +171,7 @@
     <div class="Head">
       <div class="col-md-12">
         <ul class="nav">
+		<h2>Motor Control</h2>
           <li class="nav-item dropdown ml-md-auto">
             <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink"
               data-toggle="dropdown"><font size="5">Menu</font></a>

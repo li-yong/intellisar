@@ -2,7 +2,7 @@
     Raspberry Pi GPIO Status and Control
 '''
 import RPi.GPIO as GPIO
-from flask import Flask, render_template, request,Response
+from flask import Flask, render_template, request,Response,jsonify
 from flask_socketio import SocketIO, send, emit
 
 import control2 as ctl
@@ -143,6 +143,36 @@ def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 '''
+
+@app.route("/test", methods=['GET', 'POST'])
+def test():
+   ts2 = time.time()
+   ts2a = datetime.datetime.timestamp(datetime.datetime.now())
+   ts2b = datetime.datetime.now()
+   
+   data =  request.form
+   
+   sequence = data['sequence']
+   distance = data['distance']
+   ts1 = data['ts1']
+   ts1a = data['ts1a']
+   ts1b = data['ts1b']
+
+   print('sequence '+sequence)
+   print('distance '+distance)
+   print('ts1 '+ts1)
+   print('ts1a '+ts1a)
+   
+   ts3 = time.time()
+   ts3a = datetime.datetime.timestamp(datetime.datetime.now())
+   ts3b = datetime.datetime.now()
+   #rects = datetime.datetime.timestamp(datetime.datetime.now())
+   delts = ts2 - float(ts1)
+   
+   print('I am Server. Seq '+sequence+'client sent at ts1 '+ts1+", server received at ts2 "+str(ts2)+", server responsed at ts3 "+str(ts3)+', delta ts_12 '+str(delts))
+   #time.sleep(2)
+   
+   return jsonify({'ts1':ts1, 'ts1a':ts1a,  'ts1b':ts1b, 'ts2':ts2, 'ts3':ts3 , 'ts2a':ts2a, 'ts3a':ts3a , 'ts2b':ts2b, 'ts3b':ts3b }), 200
 
 @app.route("/motor")
 def motor_index():
