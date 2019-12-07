@@ -9,7 +9,8 @@ import json
 
 def request(sequence, distance):
 
-    pi_ip= "192.168.199.142"
+    pi_ip= "192.168.199.142" #homewifi
+    pi_ip= "192.168.43.9" #mixrrr
     #http://pi/test/distance/<distance>/sequence/<sequence>/sentts/<sentts>
     #r =requests.get('http://'+pi_ip+'/distance/')
     #url = 'http://'+pi_ip+'/test/'+'distance/'+distance+'/sequence/'+sequence+'/sentts/'+sentts
@@ -65,20 +66,34 @@ def request(sequence, distance):
 
     #use the rrt d_14
     delay = d_14*1000/2
-    #print("dealy "+str(delay)+" ms")
+    print("dealy "+str(delay)+" ms distance "+str(distance) )
     return(delay)
 
 
 
     pass
 
-if __name__ == "__main__":
-    distance=100
-    n=10
-    delay=0
+
+def delay_statistic(distance):
+    ##distance = 100
+    n = 20
+    delay = 0
     cnt = 0
     for i in range(n):
         delay += request(sequence=i, distance=distance)
-    delay = round(delay/n,2)
-    print("average delay "+str(delay)+" ms at distance "+str(distance))
+    delay = round(delay / n, 2)
+    print("average delay " + str(delay) + " ms at distance " + str(distance))
+
+def measure_max_disstance():
+    i=0
+    while(1):
+        delay = request(sequence=i, distance=0)
+        i += 1
+        time.sleep(1)
+        print("seq "+str(i)+", delay "+str(delay))
+
+
+if __name__ == "__main__":
+    #measure_max_disstance()
+    delay_statistic(10)
 
