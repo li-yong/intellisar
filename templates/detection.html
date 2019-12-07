@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Intellisar">
+        <title>Intellisar Controller</title>
+        
+        <link rel="stylesheet" href="../static/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+        
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="../static/grids-responsive-min.css">
+        <!--<![endif]-->
+        
+        <link rel="stylesheet" href="../static/font-awesome.css">
+        
+            <!--[if lte IE 8]>
+                <link rel="stylesheet" href="../static/layouts/marketing-old-ie.css">
+            <![endif]-->
+            <!--[if gt IE 8]><!-->
+                <link rel="stylesheet" href="../static/layouts/marketing.css">
+            <!--<![endif]-->
+    </head>
+
+    <body>
+        <div class="header">
+            <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed pure-menu-scrollable">
+                <a class="pure-menu-heading" href=".">Intellisar</a>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="." class="pure-menu-link">Home</a></li>
+                    <li class="pure-menu-item pure-menu-selected"><a href="detection" class="pure-menu-link">Controller</a></li>
+                    <li class="pure-menu-item"><a href="temp.html" class="pure-menu-link">Sensor Data</a></li>
+                    <li class="pure-menu-item"><a href="gps.html" class="pure-menu-link">GPS</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content">
+            <br>
+            <h2 class="content-head is-center">Video Feed</h2>
+            <div class="pure-g">
+                <div class="l-box pure-u-1 pure-u-md-1-1 pure-u-lg-1-1 pure-u-xl-1-1 is-center">
+                    <img class="pure-img-responsive" src="http://{{ request.host.split(':')[0] }}:8080/video_feed" alt="Video Feed">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
