@@ -47,7 +47,7 @@
     updateSensorData();
     }
 
- 
+
     </script>
 
     <style>
@@ -103,7 +103,7 @@
     </style>
 </head>
 
-<body onload="start()">
+<body onload="start()"   onunload="leave_page()">
 
     <!--
 <h1>JASON</h1>
@@ -182,6 +182,12 @@
     socket.on('connect', function () {
         console.log('Websocket connected!');
     });
+	
+	    var leave_page = function () {
+     socket.disconnect();
+	 console.log("client disconnected");
+    }
+ 
 
 
         var data = [
