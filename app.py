@@ -231,6 +231,12 @@ def index():
     return  render_template('index.html')
 
 
+@app.route("/detection")
+def detection():
+    # Rendered template
+    return render_template('detection.html')
+
+
 if __name__ == "__main__":
     logging.info("program start")
     app.run(host='0.0.0.0', port=80, debug=True)

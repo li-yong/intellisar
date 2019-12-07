@@ -78,8 +78,9 @@ def turn_left(l=30,r=30):
     GPIO.output(PIN_EN, GPIO.HIGH)
     GPIO.output(PIN_R_DIR, GPIO.LOW)
     GPIO.output(PIN_L_DIR, GPIO.HIGH)
-    #time.sleep(0.5)
-    #GPIO.output(PIN_EN, GPIO.LOW)
+    time.sleep(0.5) #90/4 = 22 degree 
+    #time.sleep(1) #90 degree 
+    GPIO.output(PIN_EN, GPIO.LOW)
     logging.info("turn left, PIN_EN "+str(PIN_EN)+":1 , PIN_L_DIR "+str(PIN_L_DIR)+":1, PIN_R_DIR "+str(PIN_R_DIR)+":0")
     speed(l,r)
     
@@ -87,8 +88,8 @@ def turn_right(l=30,r=30):
     GPIO.output(PIN_EN, GPIO.HIGH)
     GPIO.output(PIN_R_DIR, GPIO.HIGH)
     GPIO.output(PIN_L_DIR, GPIO.LOW)
-    #time.sleep(0.5)
-    #GPIO.output(PIN_EN, GPIO.LOW)
+    time.sleep(0.5)
+    GPIO.output(PIN_EN, GPIO.LOW)
     logging.info("turn right, PIN_EN "+str(PIN_EN)+":1 , PIN_L_DIR "+str(PIN_L_DIR)+":0, PIN_R_DIR "+str(PIN_R_DIR)+":1")
     speed(l,r)
  
