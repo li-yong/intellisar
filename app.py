@@ -144,7 +144,7 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 '''
 
-<<<<<<< HEAD
+
 @app.route("/test", methods=['GET', 'POST'])
 def test():
    ts2 = time.time()
@@ -174,10 +174,7 @@ def test():
    #time.sleep(2)
    
    return jsonify({'ts1':ts1, 'ts1a':ts1a,  'ts1b':ts1b, 'ts2':ts2, 'ts3':ts3 , 'ts2a':ts2a, 'ts3a':ts3a , 'ts2b':ts2b, 'ts3b':ts3b }), 200
-=======
 
-
->>>>>>> 6e7af0df6809e828118fbb3be1726af5fac69d14
 
 @app.route("/motor")
 def motor_index():
