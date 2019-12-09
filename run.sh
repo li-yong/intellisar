@@ -13,7 +13,5 @@ sudo pkill python;
 
 #nohup sudo python us4.py &
 
-cd /home/pi/object-detection-intellisar &&  python  app.py &
-
 cd /home/pi/intellisar && sudo python app.py
 
