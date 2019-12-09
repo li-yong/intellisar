@@ -47,7 +47,7 @@
     updateSensorData();
     }
 
- 
+
     </script>
 
     <style>
@@ -103,7 +103,7 @@
     </style>
 </head>
 
-<body onload="start()">
+<body onload="start()"   onunload="leave_page()">
 
     <!--
 <h1>JASON</h1>
@@ -127,7 +127,7 @@
                             <a class="dropdown-item" href="/temp"><font size="5">Sensor Data</font></a>
                             <a class="dropdown-item" href="#"><font size="5">GPS</font></a>
                             <div class="dropdown-divider"> </div>
-                            <a class="dropdown-item" href="#"><font size="5">Object Recognization</font></a>
+                            <a class="dropdown-item" href="/detection"><font size="5">Object Recognization</font></a>
                         </div>
                     </li>
                 </ul>
@@ -137,7 +137,7 @@
         <div class="Bottom">
             <footer class="footer">
                 <div class="container">
-                    <span class="text-muted">Intellisar 2019</span>
+                    <span class="text-muted">IntelliSAR 2019</span>
                 </div>
             </footer>
         </div>
@@ -154,12 +154,12 @@
         <div id="div_time" class="Time">Time<div id="div_time_data"></div>
         </div>
 
-        <div id="div_temp" class="Temp">Temp<div id="div_temp_data"></div>
+        <div id="div_temp" class="Temp">Temperature<div id="div_temp_data"></div>
         </div>
         <div id="div_humidity" class="Humidity">Humidity<div id="div_humidity_data"></div>
         </div>
 
-        <div class="Legend">Legend:
+        <div class="Legend">Legend
             <ul style="list-style-type:disc;">
                 <li>Humidity<div class="div_orange_hum_box"></div>
                 </li>
@@ -182,6 +182,12 @@
     socket.on('connect', function () {
         console.log('Websocket connected!');
     });
+	
+	    var leave_page = function () {
+     socket.disconnect();
+	 console.log("client disconnected");
+    }
+ 
 
 
         var data = [
@@ -220,7 +226,7 @@
             console.log(time);
 			
 			var d = new Date(0)
-			datetime = d.setUTCSeconds(time);
+			d.setUTCSeconds(time);
 
             chart.push([
                 { time: time, y: templateData.temp },

@@ -228,7 +228,14 @@ def action(deviceName, action):
              
 @app.route("/")
 def index():
-    return  render_template('index.html')
+    #return  render_template('index.html')
+    return  render_template('motor.html')
+
+
+@app.route("/detection")
+def detection():
+    # Rendered template
+    return render_template('detection.html')
 
 
 if __name__ == "__main__":
