@@ -2,7 +2,7 @@
     Raspberry Pi GPIO Status and Control
 '''
 import RPi.GPIO as GPIO
-from flask import Flask, render_template, request,Response,jsonify
+from flask import Flask, render_template, request, Response,jsonify
 from flask_socketio import SocketIO, send, emit
 
 import control2 as ctl
@@ -11,10 +11,51 @@ import time
 import datetime
 import logging
 
+import threading
+from threading import Thread
+import argparse
+import cv2
+import numpy as np
+import os
+import importlib.util
+from util.videostream import VideoStream
 
-#rom camera_pi import Camera
+# If tensorflow is not installed, import interpreter from tflite_runtime, else import from regular tensorflow
+pkg = importlib.util.find_spec('tensorflow')
+if pkg is None:
+    from tflite_runtime.interpreter import Interpreter
+else:
+    from tensorflow.lite.python.interpreter import Interpreter
 
+# Define and parse input arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--modeldir', help='Directory the .tflite and labelmap files are located in. Default: model',
+                    default='model')
+parser.add_argument('--graph', help='Name of the .tflite file. Default: detect.tflite',
+                    default='detect.tflite')
+parser.add_argument('--labels', help='Name of the labelmap file. Default: labelmap.txt',
+                    default='labelmap.txt')
+parser.add_argument('--threshold', help='Minimum confidence threshold for displaying detected objects. Default: 0.5',
+                    default=0.5)
+parser.add_argument('--resolution', help='Desired resolution (WxH). If camera does not support the resolution entered, errors may occur. Default: 640x480',
+                    default='640x480')
+parser.add_argument('--framerate', help='Desired framerate (FPS). If camera does not support the framerate entered, errors may occur. Default: 30',
+                    default=30)
+parser.add_argument('--codec', help='Desired video codec (FourCC code). If FourCC code does not exist or is not supported, errors may occur. Default: X264',
+                    default='X264')
+args = parser.parse_args()
 
+# Parse resolution W and H
+resW, resH = list(map(int, args.resolution.split('x')))
+
+# Initialize the output frame and a lock used to ensure thread-safe exchanges of the output frames
+outputFrame = None
+lock = threading.Lock()
+
+# Boolean for toggling object detection
+detection_mode = True
+
+# Initialize Flask object
 app = Flask(__name__)
 
 socketio = SocketIO(app)
@@ -36,15 +77,147 @@ logging.basicConfig(
     level=logging.INFO,filename='app.log',
     datefmt='%Y-%m-%d %H:%M:%S')
 
+# Initialize VideoStream
+videostream = VideoStream(resolution=(resW, resH), framerate=args.framerate, codec=args.codec).start()
+time.sleep(2.0)
 
-'''
-def gen(camera):
-    """Video streaming generator function."""
+def object_detection():
+    # Grab global references
+    global videostream, outputFrame, lock, args, resW, resH, detection_mode
+
+    # Path to .tflite file, which contains the model that is used for object detection
+    PATH_TO_TFLITE = os.path.join(os.getcwd(), args.modeldir, args.graph)
+
+    # Path to label map file
+    PATH_TO_LABELMAP = os.path.join(os.getcwd(), args.modeldir, args.labels)
+
+    # Load the label map
+    with open(PATH_TO_LABELMAP, 'r') as f:
+        labels = [line.strip() for line in f.readlines()]
+
+    # If using the COCO "starter model" from https://www.tensorflow.org/lite/models/object_detection/overview
+    # Have to remove '???' label
+    if labels[0] == '???':
+        del(labels[0])
+
+    # Load the Tensorflow Lite model and get details
+    interpreter = Interpreter(model_path=PATH_TO_TFLITE)
+    interpreter.allocate_tensors()
+
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    height = input_details[0]['shape'][1]
+    width = input_details[0]['shape'][2]
+
+    floating_model = (input_details[0]['dtype'] == np.float32)
+
+    input_mean = 127.5
+    input_std = 127.5
+
+    # Initialize frame rate calculation
+    frame_rate_calc = 1
+    freq = cv2.getTickFrequency()
+
+    # Loop through frames from the video stream
     while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-'''
+        if detection_mode:
+            # Start timer (for calculating frame rate)
+            t1 = cv2.getTickCount()
+
+            # Grab frame from video stream
+            frame1 = videostream.read()
+
+            # Acquire frame and resize to expected shape [1xHxWx3]
+            # frame = frame1.copy()
+            frame = cv2.flip(frame1, -1)
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame_resized = cv2.resize(frame_rgb, (width, height))
+            input_data = np.expand_dims(frame_resized, axis=0)
+
+            # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
+            if floating_model:
+                input_data = (np.float32(input_data) - input_mean) / input_std
+
+            # Perform the actual detection by running the model with the image as input
+            interpreter.set_tensor(input_details[0]['index'], input_data)
+            interpreter.invoke()
+
+            # Retrieve detection results
+            boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
+            classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
+            scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
+            # num = interpreter.get_tensor(output_details[3]['index'])[0] # Total number of detected objects
+
+            # Loop over all detections and draw detection box if confidence is above minimum threshold
+            for i in range(len(scores)):
+                if ((scores[i] > args.threshold) and (scores[i] <= 1.0)):
+                    # Get bounding box coordinates and draw box
+                    # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
+                    ymin = int(max(1, (boxes[i][0] * resH)))
+                    xmin = int(max(1, (boxes[i][1] * resW)))
+                    ymax = int(min(resH, (boxes[i][2] * resH)))
+                    xmax = int(min(resW, (boxes[i][3] * resW)))
+                    
+                    cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
+
+                    # Draw label
+                    object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
+                    label = '%s: %d%%' % (object_name, int(scores[i]*100)) # Example: 'person: 72%'
+                    labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
+                    label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
+                    cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
+                    cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
+
+            # Draw detection status in top left corner of frame
+            cv2.putText(frame,'Detection: ON', (1, 12), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
+            # Draw framerate in top left corner of frame
+            cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc), (1, 24), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
+
+            # Acquire the lock, set the output frame for generate(), and release the lock
+            with lock:
+                outputFrame = frame.copy()
+
+            # Calculate framerate
+            t2 = cv2.getTickCount()
+            frame_rate_calc = 1 / ((t2 - t1) / freq)
+        else:
+            # Grab frame from video stream
+            frame1 = videostream.read()
+            frame = cv2.flip(frame1, -1)
+            # Draw detection status in top left corner of frame
+            cv2.putText(frame,'Detection: OFF', (1, 12), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
+            # Draw framerate in top left corner of frame
+            cv2.putText(frame,'FPS: {0:.2f}'.format(videostream.framerate()), (1, 24), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
+            # Acquire the lock, set the output frame for generate(), and release the lock
+            with lock:
+                outputFrame = frame.copy()
+
+def generate():
+    # Grab global references to the output frame and lock variables
+    global outputFrame, lock
+
+    # Loop over frames from the output stream
+    while True:
+        # Wait until the lock is acquired
+        with lock:
+            # Check if the output frame is available, otherwise continue
+            if outputFrame is None:
+                continue
+
+            # Encode the frame in JPEG format
+            (flag, encodedImage) = cv2.imencode('.jpg', outputFrame)
+
+            # Ensure frame was successfully encoded
+            if not flag:
+                continue
+
+        # Yield the output frame in the byte format
+        yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    # Return the response generated along with the specific media type (mime type)
+    return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 def readtmper():
     rtn = {
@@ -136,15 +309,6 @@ def on_update_event(data):
 def on_connect():
     logging.info("Client connected ")
 
-'''
-@app.route('/video_feed')
-def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-'''
-
-
 @app.route("/test", methods=['GET', 'POST'])
 def test():
    ts2 = time.time()
@@ -185,6 +349,7 @@ def motor_index():
 # The function below is executed when someone requests a URL with the actuator name and action in it:
 @app.route("/<deviceName>/<action>")
 def action(deviceName, action):
+    global detection_mode
     if (deviceName == 'motor'):
         if action == "fwd":
             ctl.forward()
@@ -204,7 +369,7 @@ def action(deviceName, action):
             ctl.speed(50,50)
         if action == "speed10":
             ctl.speed(10,10)
-    elif (deviceName=='cam'):
+    elif (deviceName == 'cam'):
         if action == "up":
             ctl.cam_up()
         if action == "down":
@@ -221,23 +386,27 @@ def action(deviceName, action):
             ctl.cam_h_patrol()
         if action == "v_patrol":
             ctl.cam_v_patrol()
+    elif (deviceName == 'detection'):
+        # Toggle detection button
+        if action == "toggle":
+            detection_mode = not detection_mode
     return '', 204
 
     #templateData = readsensor()
-    #return  render_template('motor.html', **templateData)
+    #return render_template('motor.html', **templateData)
              
 @app.route("/")
 def index():
-    #return  render_template('index.html')
-    return  render_template('motor.html')
-
-
-@app.route("/detection")
-def detection():
-    # Rendered template
-    return render_template('detection.html')
-
+    #return render_template('index.html')
+    return render_template('motor.html')
 
 if __name__ == "__main__":
-    logging.info("program start")
-    app.run(host='0.0.0.0', port=80, debug=True)
+    # Start a thread that will perform object detection
+    t = threading.Thread(target=object_detection)
+    t.daemon = True
+    t.start()
+    logging.info("Program start")
+    app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
+
+# Stop videostream after Flask webserver is shut down
+videostream.stop()

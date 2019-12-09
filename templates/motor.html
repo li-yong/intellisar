@@ -30,8 +30,17 @@
     .grid-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 0.2fr 1fr 1fr 2fr 0.1fr 1.5fr 0.1fr 0.1fr;
-      grid-template-areas: "Head Head""camera camera""camera camera""camera camera"". .""motor_ctl cam_ctl""motor_reset cam_reset""Bottom Bottom";
+      grid-template-rows: 0.2fr 1fr 1fr 2fr 0.1fr 0.5fr 1.5fr 0.1fr 0.1fr;
+      grid-template-areas: 
+        "Head Head"
+        "camera camera"
+        "camera camera"
+        "camera camera"
+        ". ."
+        "detection_ctl detection_ctl"
+        "motor_ctl cam_ctl"
+        "motor_reset cam_reset"
+        "Bottom Bottom";
     }
 
     .Head {
@@ -40,11 +49,25 @@
 
     .camera {
       grid-area: camera;
-	  text-align: center;
+      text-align: center;
     }
 
     .Bottom {
       grid-area: Bottom;
+    }
+
+    .detection_ctl {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: 
+        ". . detection_toggle . .";
+      grid-area: detection_ctl;
+    }
+
+    .detection_toggle {
+      justify-content: center;
+      grid-area: detection_toggle;
     }
 
     .motor_ctl {
@@ -185,10 +208,6 @@
               <a class="dropdown-item" href="#">
                 <font size="5">GPS</font>
               </a>
-              <div class="dropdown-divider"> </div>
-              <a class="dropdown-item" href="/detection">
-                <font size="5">Object Recognization</font>
-              </a>
             </div>
           </li>
         </ul>
@@ -196,7 +215,7 @@
     </div>
 
     <!--<div class="camera"><img alt="Camera Stream" src="http://{{ request.host.split(':')[0] }}:8080/stream/video.h264"> </div>-->
-    <div class="camera"><img alt="Camera Stream" src="http://{{ request.host.split(':')[0] }}:8080/video_feed"> </div>
+    <div class="camera"><img alt="Camera Stream" src="{{ url_for('video_feed') }}"> </div>
 
     <div class="Bottom">
       <footer class="footer">
@@ -206,12 +225,15 @@
       </footer>
     </div>
 
+    <div class="detection_ctl">
+      <div class="detection_toggle"><a href="/detection/toggle" class="btn btn-lg btn-primary btn-block" type="button">Toggle Detection</a></div>
+    </div>
 
 
     <div class="motor_ctl">
       <div class="m_up"><a href="/motor/fwd" class="btn btn-lg btn-primary btn-block" type="button">Forward</a></div>
 
-      <div class="m_stop"><a href="/motor/stop" class="btn btn-danger btn-lg btn-primary  btn-block"
+      <div class="m_stop"><a href="/motor/stop" class="btn btn-danger btn-lg btn-primary btn-block"
           type="button">Stop</a>
       </div>
 
@@ -232,9 +254,9 @@
       </div>
       <div class="c_left"> <button type="button" class="btn btn-primary" onclick="location.href='/cam/left';"> Left
         </button></div>
-      <div class="c_right"><button type="button" class="btn btn-primary" onclick="location.href='/cam/right';"> Right.
+      <div class="c_right"><button type="button" class="btn btn-primary" onclick="location.href='/cam/right';"> Right
         </button></div>
-      <div class="c_down"><a href="/cam/down" class="btn btn-lg btn-primary  btn-block" type="button">Down.</a></div>
+      <div class="c_down"><a href="/cam/down" class="btn btn-lg btn-primary  btn-block" type="button">Down</a></div>
     </div>
 
     <div class="motor_reset">
