@@ -1,4 +1,4 @@
-# IntelliSAR
+# IntelliSAR Web App
 - Raspberry Pi 4B (Raspbian Buster)
 - Python 3.7
 - OpenCV 4 (pip install is sufficient)
@@ -48,6 +48,13 @@ source /usr/local/bin/virtualenvwrapper.sh
 wget https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.0.0/tensorflow-2.0.0-cp37-none-linux_armv7l.whl
 sudo pip3 install --ignore-installed tensorflow-2.0.0-cp37-none-linux_armv7l.whl
 rm tensorflow-2.0.0-cp37-none-linux_armv7l.whl
+```
+
+## Flask Setup
+```
+pip install flask
+sudo pip3 install flask-socketio
+pip install RPi.GPIO
 ```
 
 ## How to Run
