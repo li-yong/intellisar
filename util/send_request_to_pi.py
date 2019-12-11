@@ -23,7 +23,7 @@ def request(pi_ip, sequence, distance):
     try:
         r = requests.post(url, data=data, timeout=TIMEOUT)
     except requests.exceptions.RequestException as e:
-        print("seq "+str(sequence)+" timed out")
+        print("seq "+str(sequence)+" timed out. > "+str(TIMEOUT)+" seconds")
         return(-1)
 
     r = json.loads(r.content)
@@ -94,10 +94,10 @@ def measure_max_distance(pi_ip):
             delay = request(pi_ip, sequence=i, distance=0)
         except requests.exceptions.RequestException as e:
             print("timeout at sequence " + str(i))
-            delay = 99999
+            delay = "Timeout > "+str(TIMEOUT)+" seconds"
         i += 1
-        time.sleep(2)
-        print("seq "+str(i)+", delay "+str(delay))
+        time.sleep(1)
+        print("seq "+str(i)+", delay "+str(delay)+" ms")
 
 
 if __name__ == "__main__":
