@@ -7,17 +7,12 @@ import requests
 import json
 import argparse
 
+global TIMEOUT
+TIMEOUT = 5
 
-def request(sequence, distance):
-
-    pi_ip= "192.168.199.142" #homewifi
-    #pi_ip= "192.168.43.9" #mixrrr
-    #http://pi/test/distance/<distance>/sequence/<sequence>/sentts/<sentts>
-    #r =requests.get('http://'+pi_ip+'/distance/')
-    #url = 'http://'+pi_ip+'/test/'+'distance/'+distance+'/sequence/'+sequence+'/sentts/'+sentts
+def request(pi_ip, sequence, distance):
     url = 'http://'+pi_ip+'/test'
 
-    #sentts = datetime.datetime.timestamp(datetime.datetime.now())
     ts1 = time.time()
     ts1a = datetime.datetime.timestamp(datetime.datetime.now())
     ts1b = datetime.datetime.now()
@@ -26,9 +21,9 @@ def request(sequence, distance):
     #print(str(sentts)+", post url: "+url+", data:"+str(data))
 
     try:
-        r = requests.post(url, data=data, timeout=5)
+        r = requests.post(url, data=data, timeout=TIMEOUT)
     except requests.exceptions.RequestException as e:
-        print("timeout "+str(sequence))
+        print("seq "+str(sequence)+" timed out")
         return(-1)
 
     r = json.loads(r.content)
@@ -70,14 +65,14 @@ def request(sequence, distance):
 
 
 
-def delay_statistic(packetcnt, distance):
+def delay_statistic(pi_ip, packetcnt, distance):
     ##distance = 100
     n = packetcnt
     delay = 0
     timeoutcnt = 0
     cnt = 0
     for i in range(n):
-        rst = request(sequence=i, distance=distance)
+        rst = request(pi_ip, sequence=i, distance=distance)
 
         if rst == -1:
             timeoutcnt += 1
@@ -90,13 +85,13 @@ def delay_statistic(packetcnt, distance):
     else:
         delay = round(delay /notimeoutcnt, 2)
     timeout_rate = round(timeoutcnt/n, 2)
-    print("timeout rate "+str(timeout_rate)+", average delay " + str(delay) + " ms at distance " + str(distance))
+    print("Distance " + str(distance)+", timeout ratio "+str(timeout_rate)+", average delay " + str(delay) + " ms")
 
-def measure_max_distance():
+def measure_max_distance(pi_ip):
     i=0
     while(1):
         try:
-            delay = request(sequence=i, distance=0)
+            delay = request(pi_ip, sequence=i, distance=0)
         except requests.exceptions.RequestException as e:
             print("timeout at sequence " + str(i))
             delay = 99999
@@ -108,17 +103,20 @@ def measure_max_distance():
 if __name__ == "__main__":
     # Define and parse input arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', help='[m: measure_max_distance|d: dalay_statistic',
-                        default='dalay_statistic')
+    parser.add_argument('--mode', help='<m: measure_max_distance|d: dalay_statistic>', default='d')
+    parser.add_argument('--ip', help='ip of pi')
+    parser.add_argument('--packets', help='how many packets sent to server ', default=100)
     parser.add_argument('--distance', help='distance of robot to hotspot', default=0)
-    parser.add_argument('--packets', help='how many packets sent to server ', default=3)
-    parser.add_argument('--example', help='--mode d  --packets 3 --distance 0; --mode m')
+
     args = parser.parse_args()
 
     #measure_max_disstance()
     if (args.mode == "d"):
-        delay_statistic(int(args.packets), int(args.distance))
+        delay_statistic(args.ip, int(args.packets), int(args.distance))
     elif (args.mode == "m"):
-        measure_max_distance()
+        measure_max_distance(args.ip)
 
-
+#python send_request_to_pi.py --mode d  --ip 192.168.59.136:8080 --packets 300 --distance 10
+#python send_request_to_pi.py --mode m  --ip 192.168.59.136:8080
+#pi_ip= "192.168.199.142" #homewifi
+#pi_ip= "192.168.43.9" #mobile hotspot mixrrr
