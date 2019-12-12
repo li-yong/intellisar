@@ -323,10 +323,10 @@ def test():
    ts1a = data['ts1a']
    ts1b = data['ts1b']
 
-   print('sequence '+sequence)
-   print('distance '+distance)
-   print('ts1 '+ts1)
-   print('ts1a '+ts1a)
+   #print('sequence '+sequence)
+   #print('distance '+distance)
+   #print('ts1 '+ts1)
+   #print('ts1a '+ts1a)
    
    ts3 = time.time()
    ts3a = datetime.datetime.timestamp(datetime.datetime.now())
@@ -334,7 +334,7 @@ def test():
    #rects = datetime.datetime.timestamp(datetime.datetime.now())
    delts = ts2 - float(ts1)
    
-   print('I am Server. Seq '+sequence+'client sent at ts1 '+ts1+", server received at ts2 "+str(ts2)+", server responsed at ts3 "+str(ts3)+', delta ts_12 '+str(delts))
+   #print('I am Server. Seq '+sequence+'client sent at ts1 '+ts1+", server received at ts2 "+str(ts2)+", server responsed at ts3 "+str(ts3)+', delta ts_12 '+str(delts))
    #time.sleep(2)
    
    return jsonify({'ts1':ts1, 'ts1a':ts1a,  'ts1b':ts1b, 'ts2':ts2, 'ts3':ts3 , 'ts2a':ts2a, 'ts3a':ts3a , 'ts2b':ts2b, 'ts3b':ts3b }), 200
