@@ -62,7 +62,8 @@ def measure():
     if (start <= timeout): # At max wait MAX_TIME sec in case missed the 0.
         start = time.time()
     else:
-        logging.info("start timeout")
+        logging.info("start timeout. start "+str(start)+" timeout "+str(timeout) )
+        break
   
   stop = time.time()
   timeout = stop + MAX_TIME
@@ -72,6 +73,7 @@ def measure():
         stop = time.time()
     else:
         logging.info("stop timeout")
+        break
   
   #GPIO.setup(GPIO_TRIGECHO, GPIO.OUT)
   #GPIO.output(GPIO_TRIGECHO, False)
@@ -143,6 +145,7 @@ def measure_average():
 if __name__ == '__main__':
     logging.info("Waiting for sensor to settle")
     time.sleep(2)
+    #ctl.forward(1,1)
 
     try:
         BACKWARDING = 0 #whether the car is moving backwards
@@ -153,18 +156,15 @@ if __name__ == '__main__':
         while True:
             dist = measure_average()
             logging.info ("Measured Distance = %.1f cm" % dist)
-            #time.sleep(0.1) 
-            #time.sleep(0.5) 
-            time.sleep(1) 
+            time.sleep(0.1)
 
             if dist < STOP_DISTANCE:
                 allow_straight = 0
             else:
                 allow_straight = 1
 
-            
+            time.sleep(0.5) 
             allow_turn_left = GPIO.input(PIN_INF_L);
-            time.sleep(0.5)
             allow_turn_right = GPIO.input(PIN_INF_R);
             
             logging.info(
@@ -177,50 +177,37 @@ if __name__ == '__main__':
             if FORWARDING:#moving forward
                 if allow_straight: #keep forward 
                     if (TURNR or TURNL): #change to forward if it was from forward->turn
-                        ctl.forward()
+                        ctl.forward(1,1)
                         TURNL = 0
                         TURNR = 0
-                elif allow_turn_right: #turn whenever allowed, right first 
-                    ctl.turn_right()
+                elif allow_turn_right: #turn whenever allowed, right first. After turn, speed at 1,1
+                    #tl=30,tr=30,t=0.5,al=1,ar=1
+                    ctl.turn_right(30,30,2,1,1)
                     TURNR = 1; 
-                elif allow_turn_left: #turn left when allowed
-                    ctl.turn_left()
+                elif allow_turn_left: #turn left when allowed. After turn, speed at 1,1
+                    ctl.turn_left(30,30,2,1,1)
                     TURNL = 1
                 else:  #was moving forward, not allow straight, right and left. Turn 180 degreens back.
-                    ctl.backward()
+                    ctl.backward(1,1)
                     BACKWARDING=1
                     FORWARDING=0
             
             if BACKWARDING: #moving backward
                 if allow_turn_left:
-                    ctl.turn_left()
-                    ctl.forward()
+                    time.sleep(3) #wait the robot head out of the block
+                    ctl.turn_left(30,30,2,1,1)
+                    ctl.forward(1,1)
                     BACKWARDING=0
                     FORWARDING=1
                 elif allow_turn_right:
-                    ctl.turn_right()
-                    ctl.forward()
+                    time.sleep(3) #wait the robot head out of the block
+                    ctl.turn_right(30,30,2,1,1)
+                    ctl.forward(1,1)
                     BACKWARDING=0
                     FORWARDING=1
                 else:
                     pass
-
-
-            '''
-            if (not allow_straight) and IS_MOVING and (GPIO.input(PIN_EN) == 1):        
-                GPIO.output(PIN_EN, GPIO.LOW)
-                IS_MOVING = False
-                print("less "+str(STOP_DISTANCE)+", stop")
-            elif allow_straight and (not IS_MOVING) and (GPIO.input(PIN_EN) == 0):
-                GPIO.output(PIN_EN, GPIO.HIGH)
-                IS_MOVING = True
-                print("more than "+str(STOP_DISTANCE)+", moving")
-            else:
-                pass
-            '''
-            
  
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
-        #GPIO.cleanup()

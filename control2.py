@@ -57,41 +57,44 @@ def speed(l,r):
     pl.start(l)
     pr.start(r)
     logging.info("speed "+str(l)+" "+str(r))
+    print("!!!!!!!!!!!!!!!!speed "+str(l)+" "+str(r))
 
 
 
 
-def forward(l=10,r=10):
+def forward(l=1,r=1):
     GPIO.output(PIN_EN, GPIO.HIGH)
     GPIO.output([PIN_L_DIR, PIN_R_DIR], GPIO.LOW)
     logging.info("forward, PIN_EN "+str(PIN_EN)+":1 , PIN_L_DIR "+str(PIN_L_DIR)+":0, PIN_R_DIR "+str(PIN_R_DIR)+":0")
     speed(l,r)
 
-def backward(l=10,r=10):
+def backward(l=1,r=1):
     GPIO.output(PIN_EN, GPIO.HIGH)
     GPIO.output([PIN_L_DIR, PIN_R_DIR], GPIO.HIGH)
     logging.info("backward, PIN_EN "+str(PIN_EN)+":1 , PIN_L_DIR "+str(PIN_L_DIR)+":1, PIN_R_DIR "+str(PIN_R_DIR)+":1")
     speed(l,r)
 
 
-def turn_left(l=30,r=30):
+def turn_left(tl=30,tr=30,t=0.5,al=1,ar=1): #tl/tr: turn speed, t:turn time, al/ar:after turn speed
+    speed(tl,tr) #turn around at speed 30.
     GPIO.output(PIN_EN, GPIO.HIGH)
     GPIO.output(PIN_R_DIR, GPIO.LOW)
     GPIO.output(PIN_L_DIR, GPIO.HIGH)
-    time.sleep(0.5) #90/4 = 22 degree 
+    time.sleep(t) #90/4 = 22 degree 
     #time.sleep(1) #90 degree 
     #GPIO.output(PIN_EN, GPIO.LOW)
     logging.info("turn left, PIN_EN "+str(PIN_EN)+":1 , PIN_L_DIR "+str(PIN_L_DIR)+":1, PIN_R_DIR "+str(PIN_R_DIR)+":0")
-    speed(l,r)
+    speed(al,ar)
     
-def turn_right(l=30,r=30):
+def turn_right(tl=30,tr=30,t=0.5,al=1,ar=1):
+    speed(tl,tr)
     GPIO.output(PIN_EN, GPIO.HIGH)
     GPIO.output(PIN_R_DIR, GPIO.HIGH)
     GPIO.output(PIN_L_DIR, GPIO.LOW)
-    time.sleep(0.5)
+    time.sleep(t)
     #GPIO.output(PIN_EN, GPIO.LOW)
     logging.info("turn right, PIN_EN "+str(PIN_EN)+":1 , PIN_L_DIR "+str(PIN_L_DIR)+":0, PIN_R_DIR "+str(PIN_R_DIR)+":1")
-    speed(l,r)
+    speed(al,ar)
  
 def break_stop():
     pl.stop()

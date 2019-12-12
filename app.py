@@ -352,13 +352,13 @@ def action(deviceName, action):
     global detection_mode
     if (deviceName == 'motor'):
         if action == "fwd":
-            ctl.forward()
+            ctl.forward(1,1)
         if action == "bwd":
-            ctl.backward()
+            ctl.backward(1,1)
         if action == "left":
-            ctl.turn_left()
+            ctl.turn_left(1,1)
         if action == "right":
-            ctl.turn_right()
+            ctl.turn_right(1,1)
         if action == "stop":
             ctl.detach()
         if action == "reset":
