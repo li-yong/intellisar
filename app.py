@@ -356,9 +356,9 @@ def action(deviceName, action):
         if action == "bwd":
             ctl.backward(1,1)
         if action == "left":
-            ctl.turn_left(1,1)
+            ctl.turn_left(30,30,1,1,1)
         if action == "right":
-            ctl.turn_right(1,1)
+            ctl.turn_right(30,30,1,1,1)
         if action == "stop":
             ctl.detach()
         if action == "reset":
