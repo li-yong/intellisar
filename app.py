@@ -36,11 +36,11 @@ parser.add_argument('--graph', help='Name of the .tflite file. Default: detect.t
 parser.add_argument('--labels', help='Name of the labelmap file. Default: labelmap.txt',
                     default='labelmap.txt')
 parser.add_argument('--threshold', help='Minimum confidence threshold for displaying detected objects. Default: 0.5',
-                    default=0.5)
+                    default=0.5, type=float)
 parser.add_argument('--resolution', help='Desired resolution (WxH). If camera does not support the resolution entered, errors may occur. Default: 640x480',
                     default='640x480')
 parser.add_argument('--framerate', help='Desired framerate (FPS). If camera does not support the framerate entered, errors may occur. Default: 30',
-                    default=30)
+                    default=30, type=int)
 parser.add_argument('--codec', help='Desired video codec (FourCC code). If FourCC code does not exist or is not supported, errors may occur. Default: X264',
                     default='X264')
 args = parser.parse_args()
